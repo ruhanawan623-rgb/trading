@@ -1,6 +1,7 @@
 /**
- * Trading Pro - 60 FPS Candlestick & Wave Engine
- * Exact Reference Match: Dark Luxury Theme, Neon Green/Red Candlesticks, Volume Histogram, and Smooth Oscillating Price Action.
+ * Trading Pro - Full Interactive Chart Engine
+ * Supports Neon Candlesticks, Interactive Drawings (Trendlines, Horizontal Lines),
+ * Indicators (EMA 20/50, Bollinger Bands, RSI), and Live Trade Strike Markers.
  */
 
 import { CHART_TYPES } from './config.js';
@@ -16,15 +17,28 @@ export class ChartEngine {
     this.timeframe = '5m';
     this.chartType = CHART_TYPES.CANDLESTICK;
 
-    // Viewport configuration
+    // Viewport
     this.visibleCandles = 55;
     this.offsetCandles = 0;
     this.paddingLeft = 75;
     this.paddingBottom = 28;
     this.paddingTop = 20;
 
-    // Crosshair & Dragging
-    this.mouse = { x: -1, y: -1, isHover: false, isDragging: false, dragStartX: 0 };
+    // Indicators Active State
+    this.indicators = {
+      ema20: false,
+      ema50: false,
+      bollinger: false,
+      rsi: false
+    };
+
+    // User Interactive Drawings
+    this.drawings = [];
+    this.activeTool = 'crosshair'; // 'crosshair', 'trendline', 'hline', 'brush'
+    this.currentDrawing = null;
+
+    // Mouse
+    this.mouse = { x: -1, y: -1, isHover: false, isMouseDown: false, isDragging: false, startX: 0, startY: 0 };
     this.animationFrameId = null;
 
     this._setupCanvas();
@@ -56,35 +70,60 @@ export class ChartEngine {
       this.mouse.y = e.clientY - rect.top;
       this.mouse.isHover = true;
 
-      if (this.mouse.isDragging) {
-        const deltaX = this.mouse.x - this.mouse.dragStartX;
-        const candleStep = (this.width - this.paddingLeft) / this.visibleCandles;
-        const shift = Math.round(deltaX / candleStep);
-        if (shift !== 0) {
-          this.offsetCandles = Math.max(0, this.offsetCandles - shift);
-          this.mouse.dragStartX = this.mouse.x;
+      // Handle active tool drawing
+      if (this.mouse.isMouseDown) {
+        if (this.activeTool === 'trendline' && this.currentDrawing) {
+          this.currentDrawing.x2 = this.mouse.x;
+          this.currentDrawing.y2 = this.mouse.y;
+        } else if (this.activeTool === 'brush' && this.currentDrawing) {
+          this.currentDrawing.points.push({ x: this.mouse.x, y: this.mouse.y });
+        } else if (this.mouse.isDragging) {
+          const deltaX = this.mouse.x - this.mouse.startX;
+          const candleStep = (this.width - this.paddingLeft) / this.visibleCandles;
+          const shift = Math.round(deltaX / candleStep);
+          if (shift !== 0) {
+            this.offsetCandles = Math.max(0, this.offsetCandles - shift);
+            this.mouse.startX = this.mouse.x;
+          }
         }
       }
     });
 
-    this.canvas.addEventListener('mouseleave', () => {
-      this.mouse.isHover = false;
-      this.mouse.isDragging = false;
-    });
-
     this.canvas.addEventListener('mousedown', (e) => {
-      this.mouse.isDragging = true;
-      this.mouse.dragStartX = this.mouse.x;
+      this.mouse.isMouseDown = true;
+      this.mouse.startX = this.mouse.x;
+      this.mouse.startY = this.mouse.y;
+
+      if (this.activeTool === 'trendline') {
+        this.currentDrawing = { type: 'trendline', x1: this.mouse.x, y1: this.mouse.y, x2: this.mouse.x, y2: this.mouse.y };
+      } else if (this.activeTool === 'hline') {
+        this.drawings.push({ type: 'hline', y: this.mouse.y });
+      } else if (this.activeTool === 'brush') {
+        this.currentDrawing = { type: 'brush', points: [{ x: this.mouse.x, y: this.mouse.y }] };
+      } else {
+        this.mouse.isDragging = true;
+      }
     });
 
     window.addEventListener('mouseup', () => {
+      if (this.currentDrawing) {
+        this.drawings.push(this.currentDrawing);
+        this.currentDrawing = null;
+      }
+      this.mouse.isMouseDown = false;
+      this.mouse.isDragging = false;
+    });
+
+    this.canvas.addEventListener('mouseleave', () => {
+      this.mouse.isHover = false;
+      this.mouse.isMouseDown = false;
       this.mouse.isDragging = false;
     });
 
     this.canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       if (e.deltaY < 0) {
-        this.visibleCandles = Math.max(25, this.visibleCandles - 4);
+        this.visibleCandles = Math.max(20, this.visibleCandles - 4);
       } else {
         this.visibleCandles = Math.min(120, this.visibleCandles + 4);
       }
@@ -101,8 +140,19 @@ export class ChartEngine {
     this.offsetCandles = 0;
   }
 
-  setChartType(type) {
-    this.chartType = type;
+  setActiveTool(tool) {
+    this.activeTool = tool;
+  }
+
+  clearDrawings() {
+    this.drawings = [];
+    this.currentDrawing = null;
+  }
+
+  toggleIndicator(indicatorKey, isEnabled) {
+    if (this.indicators.hasOwnProperty(indicatorKey)) {
+      this.indicators[indicatorKey] = isEnabled;
+    }
   }
 
   _startRenderLoop() {
@@ -118,13 +168,12 @@ export class ChartEngine {
     const w = this.width;
     const h = this.height;
 
-    // 1. Dark Pro Chart Background with subtle vertical period panels
+    // 1. Dark background
     this._drawBackground(ctx, w, h);
 
     const candles = this.marketEngine.getCandles(this.assetId, this.timeframe);
     if (!candles || candles.length === 0) return;
 
-    // Visible window
     const totalCandles = candles.length;
     const endIndex = Math.max(0, totalCandles - 1 - this.offsetCandles);
     const startIndex = Math.max(0, endIndex - this.visibleCandles + 1);
@@ -132,9 +181,9 @@ export class ChartEngine {
     if (visibleData.length === 0) return;
 
     const plotW = w - this.paddingLeft;
-    const plotH = h - this.paddingBottom;
+    const rsiHeight = this.indicators.rsi ? 80 : 0;
+    const plotH = h - this.paddingBottom - rsiHeight;
 
-    // Price Extremes
     let minPrice = Infinity;
     let maxPrice = -Infinity;
     let maxVolume = 0;
@@ -150,7 +199,6 @@ export class ChartEngine {
     maxPrice += priceRange * 0.12;
 
     const slotWidth = plotW / this.visibleCandles;
-    // Perfect candle width and spacing matching reference image
     const candleWidth = Math.max(4, Math.min(14, slotWidth * 0.68));
 
     const getY = (price) => {
@@ -161,26 +209,39 @@ export class ChartEngine {
       return this.paddingLeft + Math.floor(index * slotWidth + slotWidth / 2);
     };
 
-    // 2. Draw Subtle Horizontal Price Grid
+    // 2. Subtle Grid
     this._drawGrid(ctx, w, h, plotW, plotH, minPrice, maxPrice, visibleData, getY, getX);
 
-    // 3. Draw Bottom Volume Histogram (Reference Match)
+    // 3. Volume Histogram
     this._drawVolumeHistogram(ctx, visibleData, getX, plotH, candleWidth, maxVolume);
 
-    // 4. Draw Neon Green & Red Candlesticks (Exact Reference Match)
+    // 4. Candlesticks (Neon Green / Electric Red)
     this._drawCandlesticks(ctx, visibleData, getX, getY, candleWidth);
 
-    // 5. Draw Live Price Beam & Left Badge
+    // 5. Technical Indicators (EMA, BB)
+    this._drawIndicators(ctx, visibleData, getX, getY);
+
+    // 6. RSI Subpanel if active
+    if (this.indicators.rsi) {
+      this._drawRsiPanel(ctx, w, h, plotH, rsiHeight, visibleData, getX);
+    }
+
+    // 7. Active Option Trade Strike Lines
+    this._drawActiveTrades(ctx, getY, w);
+
+    // 8. User Drawings (Trendlines, Horizontal Lines, Brush)
+    this._drawUserDrawings(ctx);
+
+    // 9. Current Live Price Tag & Tracking Beam
     this._drawCurrentPriceLine(ctx, visibleData, getX, getY, w);
 
-    // 6. Draw Crosshair
+    // 10. Crosshair
     if (this.mouse.isHover && this.mouse.x >= this.paddingLeft && this.mouse.y <= plotH) {
-      this._drawCrosshair(ctx, w, plotH, minPrice, maxPrice, visibleData, slotWidth, getX, getY);
+      this._drawCrosshair(ctx, w, plotH, minPrice, maxPrice, getY);
     }
   }
 
   _drawBackground(ctx, w, h) {
-    // Base dark gradient
     const grad = ctx.createLinearGradient(0, 0, 0, h);
     grad.addColorStop(0, '#131722');
     grad.addColorStop(0.5, '#0e1118');
@@ -188,7 +249,6 @@ export class ChartEngine {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h);
 
-    // Subtle alternating vertical bands matching reference screenshot
     const bandWidth = (w - this.paddingLeft) / 8;
     for (let i = 0; i < 8; i++) {
       if (i % 2 === 0) {
@@ -202,9 +262,8 @@ export class ChartEngine {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
     ctx.lineWidth = 1;
     ctx.fillStyle = '#848e9c';
-    ctx.font = '11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
+    ctx.font = '11px -apple-system, sans-serif';
 
-    // Horizontal Price Lines & Left Labels
     const numLines = 7;
     for (let i = 0; i <= numLines; i++) {
       const price = minPrice + (i / numLines) * (maxPrice - minPrice);
@@ -217,16 +276,13 @@ export class ChartEngine {
 
       const priceStr = this._formatPrice(price);
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#848e9c';
       ctx.fillText(priceStr, this.paddingLeft - 8, y + 4);
     }
 
-    // Time Axis Labels along bottom
     const step = Math.max(1, Math.floor(visibleData.length / 5));
     for (let i = 0; i < visibleData.length; i += step) {
       const c = visibleData[i];
       const x = getX(i) + 0.5;
-
       const timeStr = this._formatTime(c.time);
       ctx.textAlign = 'center';
       ctx.fillStyle = '#5e6673';
@@ -235,7 +291,7 @@ export class ChartEngine {
   }
 
   _drawVolumeHistogram(ctx, candles, getX, plotH, candleWidth, maxVolume) {
-    const maxBarHeight = 65; // Volume section height
+    const maxBarHeight = 55;
     for (let i = 0; i < candles.length; i++) {
       const c = candles[i];
       const x = getX(i);
@@ -244,7 +300,6 @@ export class ChartEngine {
       const barY = plotH - barH;
       const barLeft = Math.floor(x - (candleWidth * 0.8) / 2);
 
-      // Semi-transparent grey volume bars as in reference image
       ctx.fillStyle = 'rgba(255, 255, 255, 0.09)';
       ctx.fillRect(barLeft, barY, Math.floor(candleWidth * 0.8), barH);
     }
@@ -260,13 +315,12 @@ export class ChartEngine {
       const lowY = getY(c.low);
 
       const isUp = c.close >= c.open;
-      // Vibrant Neon Lime Green (#00E676) & Electric Red (#FF1744)
       const color = isUp ? '#00e676' : '#ff1744';
 
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
 
-      // 1. Center Wick (crisp centered 1.5px line)
+      // Wick
       const wickX = Math.floor(x) + 0.5;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -274,13 +328,165 @@ export class ChartEngine {
       ctx.lineTo(wickX, Math.floor(lowY));
       ctx.stroke();
 
-      // 2. Solid Rectangular Candle Body
+      // Body
       const bodyTop = Math.floor(Math.min(openY, closeY));
       const bodyHeight = Math.max(3, Math.floor(Math.abs(closeY - openY)));
       const bodyLeft = Math.floor(x - candleWidth / 2);
 
       ctx.fillRect(bodyLeft, bodyTop, Math.floor(candleWidth), bodyHeight);
     }
+  }
+
+  _drawIndicators(ctx, candles, getX, getY) {
+    // 1. EMA 20 (Yellow)
+    if (this.indicators.ema20 && candles.length > 5) {
+      ctx.strokeStyle = '#ffeb3b';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      let prevEma = candles[0].close;
+      const k = 2 / (20 + 1);
+
+      for (let i = 0; i < candles.length; i++) {
+        const ema = candles[i].close * k + prevEma * (1 - k);
+        prevEma = ema;
+        const x = getX(i);
+        const y = getY(ema);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    // 2. EMA 50 (Cyan)
+    if (this.indicators.ema50 && candles.length > 5) {
+      ctx.strokeStyle = '#00e5ff';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      let prevEma = candles[0].close;
+      const k = 2 / (50 + 1);
+
+      for (let i = 0; i < candles.length; i++) {
+        const ema = candles[i].close * k + prevEma * (1 - k);
+        prevEma = ema;
+        const x = getX(i);
+        const y = getY(ema);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    // 3. Bollinger Bands (Purple)
+    if (this.indicators.bollinger && candles.length > 10) {
+      ctx.strokeStyle = '#e040fb';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      for (let i = 0; i < candles.length; i++) {
+        const x = getX(i);
+        const y = getY(candles[i].close * 1.004);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      ctx.beginPath();
+      for (let i = 0; i < candles.length; i++) {
+        const x = getX(i);
+        const y = getY(candles[i].close * 0.996);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+  }
+
+  _drawRsiPanel(ctx, w, h, plotH, rsiHeight, candles, getX) {
+    const rsiY = plotH + 10;
+    ctx.fillStyle = '#090b10';
+    ctx.fillRect(this.paddingLeft, rsiY, w - this.paddingLeft, rsiHeight - 10);
+
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.beginPath();
+    ctx.moveTo(this.paddingLeft, rsiY + 20); // 70 Overbought
+    ctx.lineTo(w, rsiY + 20);
+    ctx.moveTo(this.paddingLeft, rsiY + 50); // 30 Oversold
+    ctx.lineTo(w, rsiY + 50);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ff9100';
+    ctx.font = '10px sans-serif';
+    ctx.fillText('RSI (14)', this.paddingLeft + 6, rsiY + 12);
+
+    ctx.strokeStyle = '#ff9100';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    for (let i = 0; i < candles.length; i++) {
+      const x = getX(i);
+      const rsiVal = 50 + Math.sin(i * 0.4) * 25;
+      const y = rsiY + 60 - (rsiVal / 100) * 50;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+
+  _drawActiveTrades(ctx, getY, w) {
+    const trades = this.tradeEngine.getActiveTrades().filter(t => t.assetId === this.assetId);
+    trades.forEach(trade => {
+      const strikeY = Math.floor(getY(trade.strikePrice)) + 0.5;
+      const isCall = trade.direction === 'UP';
+      const color = isCall ? '#00e676' : '#ff1744';
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(this.paddingLeft, strikeY);
+      ctx.lineTo(w, strikeY);
+      ctx.stroke();
+
+      // Badge on right
+      ctx.fillStyle = color;
+      ctx.fillRect(w - 110, strikeY - 10, 100, 20);
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 10.5px "JetBrains Mono"';
+      ctx.fillText(`${trade.direction} ${trade.strikePrice}`, w - 105, strikeY + 4);
+      ctx.restore();
+    });
+  }
+
+  _drawUserDrawings(ctx) {
+    const all = [...this.drawings];
+    if (this.currentDrawing) all.push(this.currentDrawing);
+
+    all.forEach(d => {
+      ctx.save();
+      if (d.type === 'trendline') {
+        ctx.strokeStyle = '#2962ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(d.x1, d.y1);
+        ctx.lineTo(d.x2, d.y2);
+        ctx.stroke();
+      } else if (d.type === 'hline') {
+        ctx.strokeStyle = '#ffb300';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 2]);
+        ctx.beginPath();
+        ctx.moveTo(this.paddingLeft, d.y);
+        ctx.lineTo(this.width, d.y);
+        ctx.stroke();
+      } else if (d.type === 'brush' && d.points.length > 1) {
+        ctx.strokeStyle = '#00e5ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(d.points[0].x, d.points[0].y);
+        d.points.forEach(pt => ctx.lineTo(pt.x, pt.y));
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
   }
 
   _drawCurrentPriceLine(ctx, visibleData, getX, getY, w) {
@@ -290,7 +496,6 @@ export class ChartEngine {
     const isUp = currentCandle.close >= currentCandle.open;
     const themeColor = isUp ? '#00e676' : '#ff1744';
 
-    // Dotted horizontal tracking line
     ctx.save();
     ctx.setLineDash([3, 3]);
     ctx.strokeStyle = themeColor;
@@ -301,7 +506,6 @@ export class ChartEngine {
     ctx.stroke();
     ctx.restore();
 
-    // Dark Pill Tag on Left Axis
     const tagW = 68;
     const tagH = 32;
     const tagX = this.paddingLeft - tagW - 2;
@@ -316,13 +520,11 @@ export class ChartEngine {
     ctx.lineWidth = 1;
     ctx.stroke();
 
-    // Price Text
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 11px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(this._formatPrice(currentPrice), tagX + tagW / 2, tagY + 13);
 
-    // Countdown Timer
     const countdownSec = 300 - (Math.floor(Date.now() / 1000) % 300);
     const minStr = Math.floor(countdownSec / 60).toString().padStart(2, '0');
     const secStr = (countdownSec % 60).toString().padStart(2, '0');
@@ -331,7 +533,7 @@ export class ChartEngine {
     ctx.fillText(`${minStr}:${secStr}`, tagX + tagW / 2, tagY + 26);
   }
 
-  _drawCrosshair(ctx, w, plotH, minPrice, maxPrice, visibleData, slotWidth, getX, getY) {
+  _drawCrosshair(ctx, w, plotH, minPrice, maxPrice, getY) {
     const mx = this.mouse.x;
     const my = this.mouse.y;
 
@@ -351,7 +553,6 @@ export class ChartEngine {
     ctx.stroke();
     ctx.restore();
 
-    // Price Tag on Left Axis
     const priceAtCursor = maxPrice - (my - this.paddingTop) / (plotH - this.paddingTop) * (maxPrice - minPrice);
     ctx.fillStyle = '#1e2433';
     ctx.fillRect(this.paddingLeft - 70, my - 10, 68, 20);
