@@ -60,11 +60,14 @@ def generate_trading_prompt(data):
         prompt += "CHANNEL EQUILIBRIUM\n"
         prompt += "Analysis: Asset trading in consolidation band.\n"
 
+    prompt += f"\nTECHNICAL PLAN:\n"
+    prompt += f"1. Trend Bias: {'BULLISH' if change_pct >= 0 else 'BEARISH'}\n"
+    prompt += "2. Risk/Reward: 1:2.5 minimum\n"
+    prompt += "3. Suggested Risk: 1-2% account balance\n"
+
     return prompt
 
 class HTTPHandler(http.server.SimpleHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
     def end_headers(self):
         self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -142,11 +145,11 @@ class HTTPHandler(http.server.SimpleHTTPRequestHandler):
 if __name__ == '__main__':
     script_dir = os.path.dirname(os.path.abspath(__file__))
     os.chdir(script_dir)
-    port = 3000
+    port = 5000
 
     http.server.ThreadingHTTPServer.allow_reuse_address = True
     server = http.server.ThreadingHTTPServer(('127.0.0.1', port), HTTPHandler)
-    sys.stdout.write(f"Server ready at http://127.0.0.1:{port}\n")
+    sys.stdout.write(f"Server live at http://127.0.0.1:{port}\n")
     sys.stdout.flush()
     try:
         server.serve_forever()
