@@ -1,31 +1,32 @@
 /* ==========================================================================
-   TRADINGVIEW PRO SUPERCHARTS - EXACT DESIGN SYSTEM & THEME
+   TRADING PRO - DARK LUXURY SUPERSCHARTS THEME (EXACT REFERENCE MATCH)
    ========================================================================== */
 
 :root {
-  /* TradingView Light Theme */
-  --tv-bg-main: #ffffff;
-  --tv-bg-sub: #f0f3fa;
-  --tv-bg-hover: #f0f3fa;
-  --tv-bg-active: #e0e3eb;
-  --tv-border: #e0e3eb;
-  --tv-border-light: #f0f3fa;
+  /* Dark Pro Theme */
+  --tv-bg-main: #0e1118;
+  --tv-bg-sub: #161b26;
+  --tv-bg-card: #131722;
+  --tv-bg-hover: #1e2433;
+  --tv-bg-active: #252d3d;
+  --tv-border: #1e2433;
+  --tv-border-light: #181d2a;
 
   /* Typography */
-  --tv-text-main: #131722;
-  --tv-text-sub: #787b86;
-  --tv-text-muted: #b2b5be;
+  --tv-text-main: #e0e3eb;
+  --tv-text-sub: #848e9c;
+  --tv-text-muted: #5e6673;
 
-  /* TradingView Colors */
-  --tv-teal: #089981;
-  --tv-teal-light: #e6f5f2;
-  --tv-red: #f23645;
-  --tv-red-light: #fdebee;
+  /* Neon Candlestick Palette (Exact Reference) */
+  --tv-green-neon: #00e676;
+  --tv-green-glow: rgba(0, 230, 118, 0.2);
+  --tv-red-neon: #ff1744;
+  --tv-red-glow: rgba(255, 23, 68, 0.2);
   --tv-blue: #2962ff;
-  --tv-gold: #ff9800;
+  --tv-gold: #ffb300;
 
   /* Typography */
-  --font-tv: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+  --font-tv: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
   --radius-sm: 4px;
@@ -62,12 +63,12 @@ html, body {
 }
 
 /* ==========================================================================
-   TOP TRADINGVIEW HEADER BAR
+   TOP DARK HEADER BAR
    ========================================================================== */
 .tv-topbar {
   height: 44px;
   min-height: 44px;
-  background: var(--tv-bg-main);
+  background: var(--tv-bg-sub);
   border-bottom: 1px solid var(--tv-border);
   display: flex;
   align-items: center;
@@ -102,8 +103,8 @@ html, body {
   gap: 6px;
   padding: 5px 10px;
   border-radius: var(--radius-sm);
-  background: var(--tv-bg-sub);
-  border: 1px solid transparent;
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
   cursor: pointer;
   font-weight: 700;
   font-size: 13px;
@@ -113,7 +114,7 @@ html, body {
 
 .tv-symbol-search-btn:hover {
   background: var(--tv-bg-active);
-  border-color: var(--tv-border);
+  border-color: #2e384d;
 }
 
 .tv-top-btn {
@@ -137,8 +138,8 @@ html, body {
 }
 
 .tv-top-btn.active {
-  color: var(--tv-blue);
-  background: rgba(41, 98, 255, 0.08);
+  color: var(--tv-green-neon);
+  background: rgba(0, 230, 118, 0.12);
 }
 
 .tv-divider {
@@ -159,7 +160,7 @@ html, body {
   font-size: 12.5px;
   font-weight: 700;
   border-radius: var(--radius-md);
-  background: var(--tv-bg-sub);
+  background: var(--tv-bg-card);
   color: var(--tv-text-main);
   border: 1px solid var(--tv-border);
   cursor: pointer;
@@ -174,7 +175,7 @@ html, body {
   font-size: 12.5px;
   font-weight: 700;
   border-radius: 16px;
-  background: #1e222d;
+  background: #2962ff;
   color: #ffffff;
   border: none;
   cursor: pointer;
@@ -182,11 +183,11 @@ html, body {
 }
 
 .tv-btn-publish:hover {
-  background: #2a2e39;
+  background: #1e4bd8;
 }
 
 /* ==========================================================================
-   MAIN WORKSPACE (LEFT DRAWING BAR + CHART + RIGHT WATCHLIST)
+   WORKSPACE LAYOUT
    ========================================================================== */
 .tv-workspace {
   flex: 1;
@@ -195,11 +196,11 @@ html, body {
   position: relative;
 }
 
-/* LEFT DRAWING TOOLBAR */
+/* LEFT TOOLBAR */
 .tv-left-toolbar {
   width: 48px;
   min-width: 48px;
-  background: var(--tv-bg-main);
+  background: var(--tv-bg-sub);
   border-right: 1px solid var(--tv-border);
   display: flex;
   flex-direction: column;
@@ -237,8 +238,8 @@ html, body {
 }
 
 .tv-tool-btn.active {
-  color: var(--tv-blue);
-  background: rgba(41, 98, 255, 0.08);
+  color: var(--tv-green-neon);
+  background: rgba(0, 230, 118, 0.12);
 }
 
 .tv-tool-btn svg {
@@ -253,7 +254,7 @@ html, body {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: #ffffff;
+  background: #0d0f14;
   overflow: hidden;
 }
 
@@ -290,21 +291,22 @@ html, body {
 }
 
 .ohlc-val {
-  color: var(--tv-teal);
+  color: var(--tv-green-neon);
   font-weight: 600;
 }
 
-/* QUICK TRADE FLOATING WIDGET (TOP LEFT ON CHART) */
+/* QUICK TRADE FLOATING WIDGET */
 .tv-quick-trade-box {
   position: absolute;
   top: 42px;
   left: 16px;
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: rgba(22, 27, 38, 0.92);
+  backdrop-filter: blur(8px);
   border: 1px solid var(--tv-border);
   border-radius: var(--radius-md);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   overflow: hidden;
   z-index: 20;
 }
@@ -321,17 +323,17 @@ html, body {
 }
 
 .tv-quick-btn-sell {
-  color: var(--tv-red);
+  color: var(--tv-red-neon);
 }
 .tv-quick-btn-sell:hover {
-  background: var(--tv-red-light);
+  background: rgba(255, 23, 68, 0.18);
 }
 
 .tv-quick-btn-buy {
-  color: var(--tv-blue);
+  color: var(--tv-green-neon);
 }
 .tv-quick-btn-buy:hover {
-  background: rgba(41, 98, 255, 0.08);
+  background: rgba(0, 230, 118, 0.18);
 }
 
 .tv-quick-price {
@@ -372,11 +374,11 @@ canvas#mainChartCanvas {
   height: 100%;
 }
 
-/* BOTTOM TIME BAR & RANGE SELECTOR */
+/* BOTTOM TIME BAR */
 .tv-bottom-bar {
   height: 34px;
   min-height: 34px;
-  background: var(--tv-bg-main);
+  background: var(--tv-bg-sub);
   border-top: 1px solid var(--tv-border);
   display: flex;
   align-items: center;
@@ -412,16 +414,16 @@ canvas#mainChartCanvas {
 
 .tv-range-btn.active {
   background: var(--tv-bg-active);
-  color: var(--tv-blue);
+  color: var(--tv-green-neon);
 }
 
 /* ==========================================================================
-   RIGHT SIDEBAR: WATCHLIST & DETAILS WIDGET
+   RIGHT SIDEBAR: WATCHLIST & DETAILS
    ========================================================================== */
 .tv-right-sidebar {
   width: 320px;
   min-width: 320px;
-  background: var(--tv-bg-main);
+  background: var(--tv-bg-sub);
   border-left: 1px solid var(--tv-border);
   display: flex;
   z-index: 30;
@@ -467,7 +469,7 @@ canvas#mainChartCanvas {
   font-size: 11px;
   font-weight: 600;
   color: var(--tv-text-sub);
-  border-bottom: 1px solid var(--tv-border-light);
+  border-bottom: 1px solid var(--tv-border);
 }
 
 .tv-wl-section-title {
@@ -494,8 +496,8 @@ canvas#mainChartCanvas {
 }
 
 .tv-wl-row.active {
-  background: #f4f7fc;
-  border-left: 3px solid var(--tv-blue);
+  background: rgba(0, 230, 118, 0.08);
+  border-left: 3px solid var(--tv-green-neon);
   font-weight: 700;
 }
 
@@ -513,31 +515,25 @@ canvas#mainChartCanvas {
   text-align: right;
 }
 
-.tv-val-chg {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-align: right;
-}
-
-.tv-val-chgpct {
+.tv-val-chg, .tv-val-chgpct {
   font-family: var(--font-mono);
   font-weight: 600;
   text-align: right;
 }
 
 .text-teal {
-  color: var(--tv-teal) !important;
+  color: var(--tv-green-neon) !important;
 }
 
 .text-red {
-  color: var(--tv-red) !important;
+  color: var(--tv-red-neon) !important;
 }
 
 /* SELECTED ASSET DETAIL CARD */
 .tv-detail-card {
   padding: 14px;
   border-top: 1px solid var(--tv-border);
-  background: #fafbfd;
+  background: var(--tv-bg-card);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -571,10 +567,6 @@ canvas#mainChartCanvas {
   margin-top: 4px;
 }
 
-.tv-detail-big-price span.fraction {
-  color: var(--tv-red);
-}
-
 .tv-detail-change-row {
   display: flex;
   align-items: center;
@@ -597,23 +589,23 @@ canvas#mainChartCanvas {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--tv-teal);
+  background: var(--tv-green-neon);
+  box-shadow: 0 0 8px var(--tv-green-neon);
 }
 
 /* NEWS MINI CARD */
 .tv-news-card {
   margin: 10px 14px 14px;
   padding: 12px;
-  background: #ffffff;
+  background: var(--tv-bg-card);
   border: 1px solid var(--tv-border);
   border-radius: var(--radius-md);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
 
 .tv-news-meta {
   font-size: 11px;
   font-weight: 700;
-  color: #5c6bc0;
+  color: #7986cb;
   margin-bottom: 4px;
 }
 
@@ -628,7 +620,7 @@ canvas#mainChartCanvas {
 .tv-far-right-dock {
   width: 44px;
   min-width: 44px;
-  background: var(--tv-bg-main);
+  background: var(--tv-bg-sub);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -663,6 +655,6 @@ canvas#mainChartCanvas {
 }
 
 .tv-dock-btn.active {
-  color: var(--tv-blue);
-  background: rgba(41, 98, 255, 0.08);
+  color: var(--tv-green-neon);
+  background: rgba(0, 230, 118, 0.12);
 }
