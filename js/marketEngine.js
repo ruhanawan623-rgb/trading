@@ -1,6 +1,6 @@
 /**
- * Olymp Trade Pro - Real-Time Market Feed & Professional Candlestick Simulator
- * Generates authentic multi-wave market structures, realistic wicks, swings & live ticks
+ * Real-Time Market Feed & Wave Engine
+ * Produces smooth multi-candle market waves, realistic swings, and volume distribution
  */
 
 import { ASSETS, TIMEFRAMES } from './config.js';
@@ -8,15 +8,15 @@ import { ASSETS, TIMEFRAMES } from './config.js';
 class MarketEngine {
   constructor() {
     this.assets = new Map();
-    this.candles = new Map(); // key: `${assetId}_${timeframe}` -> Array<Candle>
+    this.candles = new Map();
     this.subscribers = new Set();
     this.ws = null;
     this.isWsConnected = false;
     this.tickInterval = null;
-    this.activeAssetId = 'ASIA_INDEX';
+    this.activeAssetId = 'XAUUSD';
 
     this._initializeAssets();
-    this._generateRealisticMarketHistory();
+    this._generateSinusoidalWaveHistory();
     this._startLiveTickEngine();
     this._connectBinanceWebSocket();
   }
@@ -34,8 +34,9 @@ class MarketEngine {
         change24h: 0,
         change24hPct: 0,
         direction: 'neutral',
-        trendDirection: Math.random() > 0.5 ? 1 : -1,
-        trendRemaining: Math.floor(Math.random() * 8) + 4,
+        trendDirection: 1,
+        waveProgress: 0,
+        wavePeriod: 16, // 16 candles per cycle wave
         lastTickTime: Date.now()
       });
       this._update24hMetrics(asset.id);
@@ -51,7 +52,7 @@ class MarketEngine {
     if (asset.currentPrice < asset.low24h) asset.low24h = asset.currentPrice;
   }
 
-  _generateRealisticMarketHistory() {
+  _generateSinusoidalWaveHistory() {
     const numCandles = 250;
     const now = Date.now();
 
@@ -62,35 +63,26 @@ class MarketEngine {
         const candleList = [];
 
         let currentPrice = asset.basePrice;
-        let trend = -1; // Default downtrend like in screenshot
-        let trendLength = 12;
+        const waveAmplitude = asset.basePrice * asset.volatility * 6;
 
-        // Pre-generate wave structures
         for (let i = numCandles; i >= 0; i--) {
           const timestamp = now - i * candleDurationMs;
-
-          // Switch trend waves
-          trendLength--;
-          if (trendLength <= 0) {
-            trend = trend === 1 ? -1 : (Math.random() > 0.35 ? 1 : -1);
-            trendLength = Math.floor(Math.random() * 9) + 4;
-          }
-
-          const baseStep = currentPrice * asset.volatility * Math.sqrt(tf.candleSeconds);
-          const isReversalCandle = Math.random() < 0.22; // counter-trend pullback
-          const candleDirection = isReversalCandle ? -trend : trend;
+          const phase = ((numCandles - i) / 14) * Math.PI; // Sinusoidal harmonic
+          const waveSlope = Math.cos(phase);
+          const noise = (Math.random() - 0.5) * (asset.basePrice * asset.volatility * 0.8);
 
           const open = currentPrice;
-          const bodyDelta = (Math.random() * 0.8 + 0.2) * baseStep * candleDirection;
-          const close = open + bodyDelta;
+          const bodyStep = (waveSlope * (waveAmplitude / 7)) + noise;
+          const close = open + bodyStep;
 
-          // Upper & Lower Wicks (Shadows)
-          const wickTop = Math.random() * (baseStep * 0.6);
-          const wickBottom = Math.random() * (baseStep * 0.6);
+          const wickTop = Math.random() * (waveAmplitude * 0.18);
+          const wickBottom = Math.random() * (waveAmplitude * 0.18);
 
           const high = Math.max(open, close) + wickTop;
           const low = Math.min(open, close) - wickBottom;
-          const volume = Math.floor(Math.random() * 60) + 15;
+
+          // Realistic Volume bell curve
+          const volume = Math.floor(Math.abs(bodyStep) * 45 + Math.random() * 25 + 15);
 
           currentPrice = close;
 
@@ -104,8 +96,7 @@ class MarketEngine {
           });
         }
 
-        // Set current asset price to last historical close
-        if (tf.id === '1m') {
+        if (tf.id === '5m') {
           const last = candleList[candleList.length - 1];
           const assetObj = this.assets.get(asset.id);
           if (assetObj) {
@@ -145,7 +136,6 @@ class MarketEngine {
   }
 
   _startLiveTickEngine() {
-    // Micro-tick frequency: updates every 200ms
     this.tickInterval = setInterval(() => {
       ASSETS.forEach(asset => {
         if (asset.isLiveFeed && this.isWsConnected) return;
@@ -153,16 +143,11 @@ class MarketEngine {
         const current = this.assets.get(asset.id);
         if (!current) return;
 
-        // Wave momentum
-        current.trendRemaining--;
-        if (current.trendRemaining <= 0) {
-          current.trendDirection = current.trendDirection === 1 ? -1 : 1;
-          current.trendRemaining = Math.floor(Math.random() * 10) + 5;
-        }
-
-        const microVol = current.volatility * 0.18;
-        const drift = microVol * 0.4 * current.trendDirection;
-        const noise = (Math.random() - 0.5) * microVol;
+        current.waveProgress += 0.08;
+        const waveSlope = Math.cos(current.waveProgress);
+        const microVol = current.volatility * 0.15;
+        const drift = waveSlope * microVol;
+        const noise = (Math.random() - 0.5) * microVol * 0.6;
         const step = current.currentPrice * (drift + noise);
         const newPrice = Math.max(0.0001, current.currentPrice + step);
 
@@ -182,7 +167,6 @@ class MarketEngine {
     asset.lastTickTime = Date.now();
     this._update24hMetrics(assetId);
 
-    // Update Candles across all timeframes for this asset
     TIMEFRAMES.forEach(tf => {
       const key = `${assetId}_${tf.id}`;
       const candleList = this.candles.get(key);
@@ -193,7 +177,6 @@ class MarketEngine {
       const now = Date.now();
 
       if (now - lastCandle.time >= candleDurationMs) {
-        // Create brand new candle
         const newCandle = {
           time: now,
           open: lastCandle.close,
@@ -205,7 +188,6 @@ class MarketEngine {
         candleList.push(newCandle);
         if (candleList.length > 300) candleList.shift();
       } else {
-        // Update currently active candle
         lastCandle.close = asset.currentPrice;
         if (asset.currentPrice > lastCandle.high) lastCandle.high = asset.currentPrice;
         if (asset.currentPrice < lastCandle.low) lastCandle.low = asset.currentPrice;
@@ -245,22 +227,6 @@ class MarketEngine {
   getCandles(assetId, timeframeId) {
     const key = `${assetId}_${timeframeId}`;
     return this.candles.get(key) || [];
-  }
-
-  getOrderBook(assetId) {
-    const asset = this.assets.get(assetId);
-    if (!asset) return { bids: [], asks: [] };
-
-    const mid = asset.currentPrice;
-    const spread = mid * 0.00015;
-    const bids = [];
-    const asks = [];
-
-    for (let i = 1; i <= 6; i++) {
-      bids.push({ price: mid - spread * i, amount: (Math.random() * 3 + 0.5).toFixed(2) });
-      asks.push({ price: mid + spread * i, amount: (Math.random() * 3 + 0.5).toFixed(2) });
-    }
-    return { bids, asks };
   }
 }
 
