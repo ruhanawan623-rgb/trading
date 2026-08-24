@@ -1,0 +1,430 @@
+/* ==========================================================================
+   OLYMP TRADE PRO - TRADING TERMINAL & ORDER EXECUTION STYLES
+   ========================================================================== */
+
+.trading-terminal {
+  width: 320px;
+  min-width: 320px;
+  background-color: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  border-left: 1px solid var(--border-color);
+  z-index: 20;
+}
+
+/* Terminal Mode Tabs (FTT Fixed Time / CFD Forex) */
+.terminal-mode-tabs {
+  display: flex;
+  background: rgba(11, 14, 20, 0.6);
+  padding: 4px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.mode-tab {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-radius: var(--radius-xs);
+  transition: var(--trans-fast);
+  text-align: center;
+  position: relative;
+}
+
+.mode-tab:hover {
+  color: var(--text-primary);
+}
+
+.mode-tab.active {
+  color: #fff;
+  background: var(--bg-surface-elevated);
+  box-shadow: var(--shadow-sm);
+}
+
+.mode-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--accent-cyan);
+  border-radius: 2px;
+}
+
+/* Payout & Asset Info Banner */
+.terminal-asset-banner {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%);
+}
+
+.banner-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.banner-symbol {
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.banner-asset-name {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.banner-payout {
+  text-align: right;
+}
+
+.payout-pct {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--up-color);
+  text-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
+}
+
+.payout-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* Input Form Controls */
+.terminal-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-header span {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Duration / Expiration Selector */
+.duration-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.duration-chip {
+  padding: 8px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  text-align: center;
+  transition: var(--trans-fast);
+}
+
+.duration-chip:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.duration-chip.active {
+  background: var(--accent-blue);
+  border-color: var(--accent-cyan);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(58, 123, 213, 0.4);
+}
+
+/* Amount Selector & Quick Multipliers */
+.amount-input-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  position: relative;
+  transition: var(--trans-fast);
+}
+
+.amount-input-box:focus-within {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.2);
+}
+
+.step-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-xs);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.step-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.amount-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  padding: 4px;
+}
+
+.amount-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.amount-chip {
+  padding: 5px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  color: var(--text-muted);
+}
+
+.amount-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* Payout Calculation Card */
+.payout-preview-card {
+  background: rgba(18, 24, 36, 0.6);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.payout-title {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.payout-calculated {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--up-color);
+}
+
+/* BIG TRADE ACTION BUTTONS (UP & DOWN) */
+.trade-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.btn-trade {
+  position: relative;
+  width: 100%;
+  height: 60px;
+  border-radius: var(--radius-md);
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-trade:hover {
+  transform: translateY(-2px);
+}
+
+.btn-trade:active {
+  transform: translateY(1px);
+}
+
+.btn-trade-up {
+  background: linear-gradient(135deg, #00b074 0%, #00e676 100%);
+  box-shadow: 0 6px 20px rgba(0, 230, 118, 0.35);
+}
+
+.btn-trade-up:hover {
+  box-shadow: 0 8px 25px rgba(0, 230, 118, 0.5);
+  background: linear-gradient(135deg, #00c984 0%, #00ff84 100%);
+}
+
+.btn-trade-down {
+  background: linear-gradient(135deg, #e53935 0%, #ff3b69 100%);
+  box-shadow: 0 6px 20px rgba(255, 59, 105, 0.35);
+}
+
+.btn-trade-down:hover {
+  box-shadow: 0 8px 25px rgba(255, 59, 105, 0.5);
+  background: linear-gradient(135deg, #f5433f 0%, #ff527b 100%);
+}
+
+.trade-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.trade-btn-title {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.trade-btn-subtitle {
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+.trade-btn-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trade-btn-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* CFD Specific Controls */
+.cfd-controls {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cfd-controls.active {
+  display: flex;
+}
+
+.multiplier-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+.multiplier-chip {
+  padding: 6px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+}
+
+.multiplier-chip.active {
+  background: var(--accent-purple);
+  color: #fff;
+  border-color: #a855f7;
+}
+
+.tpsl-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+/* Sentiment Radar & Order Book Bar */
+.sentiment-section {
+  padding: 14px 16px;
+  background: rgba(11, 14, 20, 0.4);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sentiment-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sentiment-bar-track {
+  height: 8px;
+  width: 100%;
+  background: var(--down-color);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+}
+
+.sentiment-bar-bull {
+  height: 100%;
+  background: var(--up-color);
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.6);
+  transition: width 0.4s ease;
+}
+
+.sentiment-numbers {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bull-val { color: var(--up-color); }
+.bear-val { color: var(--down-color); }
