@@ -1,9 +1,8 @@
 /* ==========================================================================
-   TRADING PRO - DARK LUXURY SUPERSCHARTS THEME (EXACT REFERENCE MATCH)
+   TRADING PRO - DARK LUXURY STYLESHEET & INTERACTIVE SYSTEM
    ========================================================================== */
 
 :root {
-  /* Dark Pro Theme */
   --tv-bg-main: #0e1118;
   --tv-bg-sub: #161b26;
   --tv-bg-card: #131722;
@@ -17,15 +16,14 @@
   --tv-text-sub: #848e9c;
   --tv-text-muted: #5e6673;
 
-  /* Neon Candlestick Palette (Exact Reference) */
+  /* Neon Candlestick Palette */
   --tv-green-neon: #00e676;
-  --tv-green-glow: rgba(0, 230, 118, 0.2);
+  --tv-green-glow: rgba(0, 230, 118, 0.25);
   --tv-red-neon: #ff1744;
-  --tv-red-glow: rgba(255, 23, 68, 0.2);
+  --tv-red-glow: rgba(255, 23, 68, 0.25);
   --tv-blue: #2962ff;
   --tv-gold: #ffb300;
 
-  /* Typography */
   --font-tv: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
 
@@ -63,11 +61,11 @@ html, body {
 }
 
 /* ==========================================================================
-   TOP DARK HEADER BAR
+   HEADER BAR
    ========================================================================== */
 .tv-topbar {
-  height: 44px;
-  min-height: 44px;
+  height: 46px;
+  min-height: 46px;
   background: var(--tv-bg-sub);
   border-bottom: 1px solid var(--tv-border);
   display: flex;
@@ -77,7 +75,7 @@ html, body {
   z-index: 50;
 }
 
-.tv-topbar-left {
+.tv-topbar-left, .tv-topbar-right {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -101,7 +99,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: var(--radius-sm);
   background: var(--tv-bg-card);
   border: 1px solid var(--tv-border);
@@ -117,6 +115,12 @@ html, body {
   border-color: #2e384d;
 }
 
+.tv-tf-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
 .tv-top-btn {
   height: 32px;
   padding: 0 8px;
@@ -126,7 +130,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--tv-text-main);
   cursor: pointer;
@@ -149,25 +153,51 @@ html, body {
   margin: 0 4px;
 }
 
-.tv-topbar-right {
+/* Balance Badge */
+.tv-balance-badge {
   display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tv-btn-trade {
-  padding: 6px 14px;
-  font-size: 12.5px;
-  font-weight: 700;
-  border-radius: var(--radius-md);
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 4px 10px;
   background: var(--tv-bg-card);
-  color: var(--tv-text-main);
   border: 1px solid var(--tv-border);
+  border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
-.tv-btn-trade:hover {
-  background: var(--tv-bg-active);
+.tv-balance-badge:hover {
+  border-color: var(--tv-green-neon);
+}
+
+.tv-balance-type {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: var(--tv-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.tv-balance-amt {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--tv-green-neon);
+}
+
+.tv-btn-deposit {
+  padding: 6px 12px;
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--tv-green-neon);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tv-btn-deposit:hover {
+  background: var(--tv-green-neon);
+  color: #000;
 }
 
 .tv-btn-publish {
@@ -418,7 +448,7 @@ canvas#mainChartCanvas {
 }
 
 /* ==========================================================================
-   RIGHT SIDEBAR: WATCHLIST & DETAILS
+   RIGHT SIDEBAR: WATCHLIST & TRADE EXECUTION TERMINAL
    ========================================================================== */
 .tv-right-sidebar {
   width: 320px;
@@ -454,14 +484,6 @@ canvas#mainChartCanvas {
   gap: 4px;
 }
 
-.tv-wl-icons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--tv-text-sub);
-}
-
-/* Watchlist Table */
 .tv-wl-table-header {
   display: grid;
   grid-template-columns: 1fr 65px 50px 55px;
@@ -509,25 +531,14 @@ canvas#mainChartCanvas {
   color: var(--tv-text-main);
 }
 
-.tv-val-price {
+.tv-val-price, .tv-val-chg, .tv-val-chgpct {
   font-family: var(--font-mono);
   font-weight: 700;
   text-align: right;
 }
 
-.tv-val-chg, .tv-val-chgpct {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  text-align: right;
-}
-
-.text-teal {
-  color: var(--tv-green-neon) !important;
-}
-
-.text-red {
-  color: var(--tv-red-neon) !important;
-}
+.text-teal { color: var(--tv-green-neon) !important; }
+.text-red { color: var(--tv-red-neon) !important; }
 
 /* SELECTED ASSET DETAIL CARD */
 .tv-detail-card {
@@ -593,30 +604,168 @@ canvas#mainChartCanvas {
   box-shadow: 0 0 8px var(--tv-green-neon);
 }
 
-/* NEWS MINI CARD */
-.tv-news-card {
-  margin: 10px 14px 14px;
-  padding: 12px;
+/* ==========================================================================
+   TRADE EXECUTION TERMINAL STYLES (OPTIONS & CFD)
+   ========================================================================== */
+.trade-mode-toggle {
+  display: flex;
   background: var(--tv-bg-card);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 4px;
+  margin-bottom: 14px;
   border: 1px solid var(--tv-border);
-  border-radius: var(--radius-md);
 }
 
-.tv-news-meta {
+.mode-btn {
+  flex: 1;
+  padding: 6px;
   font-size: 11px;
   font-weight: 700;
-  color: #7986cb;
-  margin-bottom: 4px;
+  background: none;
+  border: none;
+  color: var(--tv-text-sub);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
 }
 
-.tv-news-headline {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.35;
+.mode-btn.active {
+  background: var(--tv-bg-active);
+  color: #fff;
+}
+
+.terminal-group {
+  margin-bottom: 14px;
+}
+
+.terminal-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--tv-text-sub);
+  margin-bottom: 6px;
+}
+
+.terminal-stepper {
+  display: flex;
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.step-btn {
+  width: 42px;
+  height: 38px;
+  background: none;
+  border: none;
+  color: var(--tv-text-main);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-btn:hover {
+  background: var(--tv-bg-active);
+}
+
+.step-input {
+  flex: 1;
+  background: none;
+  border: none;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--tv-text-main);
+  outline: none;
+}
+
+.quick-amounts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.qa-btn, .qd-btn {
+  padding: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-sm);
+  color: var(--tv-text-sub);
+  cursor: pointer;
+}
+
+.qa-btn:hover, .qd-btn:hover {
+  background: var(--tv-bg-active);
   color: var(--tv-text-main);
 }
 
-/* FAR RIGHT VERTICAL DOCK */
+.qd-btn.active {
+  border-color: var(--tv-blue);
+  color: #fff;
+  background: var(--tv-bg-active);
+}
+
+.payout-card {
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trade-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.action-btn-up, .action-btn-down {
+  height: 60px;
+  border: none;
+  border-radius: var(--radius-md);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.action-btn-up {
+  background: linear-gradient(180deg, #00e676 0%, #00b359 100%);
+  box-shadow: 0 4px 14px var(--tv-green-glow);
+}
+
+.action-btn-up:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--tv-green-glow);
+}
+
+.action-btn-down {
+  background: linear-gradient(180deg, #ff1744 0%, #d50000 100%);
+  box-shadow: 0 4px 14px var(--tv-red-glow);
+}
+
+.action-btn-down:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--tv-red-glow);
+}
+
+/* ==========================================================================
+   FAR RIGHT VERTICAL DOCK
+   ========================================================================== */
 .tv-far-right-dock {
   width: 44px;
   min-width: 44px;
@@ -657,4 +806,141 @@ canvas#mainChartCanvas {
 .tv-dock-btn.active {
   color: var(--tv-green-neon);
   background: rgba(0, 230, 118, 0.12);
+}
+
+/* ==========================================================================
+   MODALS AND OVERLAYS
+   ========================================================================== */
+.tv-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.tv-modal-overlay.active {
+  display: flex;
+}
+
+.tv-modal-box {
+  width: 90%;
+  max-width: 540px;
+  background: var(--tv-bg-sub);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+  animation: modalFadeIn 0.15s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.tv-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.tv-modal-close {
+  background: none;
+  border: none;
+  color: var(--tv-text-sub);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tv-search-input {
+  width: 100%;
+  height: 40px;
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-md);
+  padding: 0 12px;
+  color: #fff;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.tv-category-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+}
+
+.cat-tab {
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-sm);
+  color: var(--tv-text-sub);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cat-tab.active {
+  background: var(--tv-blue);
+  color: #fff;
+  border-color: var(--tv-blue);
+}
+
+.tv-asset-list-container {
+  max-height: 280px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.modal-asset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--tv-bg-card);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.modal-asset-item:hover {
+  background: var(--tv-bg-active);
+}
+
+.indicator-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: var(--tv-bg-card);
+  border: 1px solid var(--tv-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+}
+
+/* Toast Container */
+#toastContainer {
+  position: fixed;
+  bottom: 45px;
+  right: 340px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
 }
