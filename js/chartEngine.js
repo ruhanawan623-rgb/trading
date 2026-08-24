@@ -1,6 +1,6 @@
 /**
- * TradingView Supercharts Pro - 60 FPS Canvas Engine
- * Exact TradingView Candlestick Styling, OHLC readouts, Dotted Tracking lines, and Countdown Pills.
+ * Trading Pro - 60 FPS Candlestick & Wave Engine
+ * Exact Reference Match: Dark Luxury Theme, Neon Green/Red Candlesticks, Volume Histogram, and Smooth Oscillating Price Action.
  */
 
 import { CHART_TYPES } from './config.js';
@@ -12,16 +12,16 @@ export class ChartEngine {
     this.marketEngine = marketEngine;
     this.tradeEngine = tradeEngine;
 
-    this.assetId = 'XAUUSD'; // Default to GOLD as in reference image!
-    this.timeframe = '5m';   // 5m as in reference image!
+    this.assetId = 'XAUUSD';
+    this.timeframe = '5m';
     this.chartType = CHART_TYPES.CANDLESTICK;
 
     // Viewport configuration
-    this.visibleCandles = 65;
+    this.visibleCandles = 55;
     this.offsetCandles = 0;
-    this.paddingLeft = 75;  // Left price axis as in screenshot!
-    this.paddingBottom = 28; // Bottom time axis
-    this.paddingTop = 25;
+    this.paddingLeft = 75;
+    this.paddingBottom = 28;
+    this.paddingTop = 20;
 
     // Crosshair & Dragging
     this.mouse = { x: -1, y: -1, isHover: false, isDragging: false, dragStartX: 0 };
@@ -86,7 +86,7 @@ export class ChartEngine {
       if (e.deltaY < 0) {
         this.visibleCandles = Math.max(25, this.visibleCandles - 4);
       } else {
-        this.visibleCandles = Math.min(150, this.visibleCandles + 4);
+        this.visibleCandles = Math.min(120, this.visibleCandles + 4);
       }
     }, { passive: false });
   }
@@ -118,9 +118,8 @@ export class ChartEngine {
     const w = this.width;
     const h = this.height;
 
-    // Clean white background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, w, h);
+    // 1. Dark Pro Chart Background with subtle vertical period panels
+    this._drawBackground(ctx, w, h);
 
     const candles = this.marketEngine.getCandles(this.assetId, this.timeframe);
     if (!candles || candles.length === 0) return;
@@ -138,18 +137,21 @@ export class ChartEngine {
     // Price Extremes
     let minPrice = Infinity;
     let maxPrice = -Infinity;
+    let maxVolume = 0;
 
     visibleData.forEach(c => {
       if (c.low < minPrice) minPrice = c.low;
       if (c.high > maxPrice) maxPrice = c.high;
+      if (c.volume > maxVolume) maxVolume = c.volume;
     });
 
     const priceRange = maxPrice - minPrice || 1;
-    minPrice -= priceRange * 0.08;
-    maxPrice += priceRange * 0.08;
+    minPrice -= priceRange * 0.12;
+    maxPrice += priceRange * 0.12;
 
     const slotWidth = plotW / this.visibleCandles;
-    const candleWidth = Math.max(3, Math.min(12, slotWidth * 0.72));
+    // Perfect candle width and spacing matching reference image
+    const candleWidth = Math.max(4, Math.min(14, slotWidth * 0.68));
 
     const getY = (price) => {
       return this.paddingTop + (1 - (price - minPrice) / (maxPrice - minPrice)) * (plotH - this.paddingTop);
@@ -159,32 +161,51 @@ export class ChartEngine {
       return this.paddingLeft + Math.floor(index * slotWidth + slotWidth / 2);
     };
 
-    // 1. Draw TradingView Subtle Grid & Left Axis
+    // 2. Draw Subtle Horizontal Price Grid
     this._drawGrid(ctx, w, h, plotW, plotH, minPrice, maxPrice, visibleData, getY, getX);
 
-    // 2. Draw Candlesticks (Teal / Red)
+    // 3. Draw Bottom Volume Histogram (Reference Match)
+    this._drawVolumeHistogram(ctx, visibleData, getX, plotH, candleWidth, maxVolume);
+
+    // 4. Draw Neon Green & Red Candlesticks (Exact Reference Match)
     this._drawCandlesticks(ctx, visibleData, getX, getY, candleWidth);
 
-    // 3. Draw Watermark & Event Icons
-    this._drawWatermarkAndEvents(ctx, w, plotH);
-
-    // 4. Draw Current Price Dotted Line & Left Deep Teal Badge [ 4,649.237 \n 01:28 ]
+    // 5. Draw Live Price Beam & Left Badge
     this._drawCurrentPriceLine(ctx, visibleData, getX, getY, w);
 
-    // 5. Draw Crosshair
+    // 6. Draw Crosshair
     if (this.mouse.isHover && this.mouse.x >= this.paddingLeft && this.mouse.y <= plotH) {
       this._drawCrosshair(ctx, w, plotH, minPrice, maxPrice, visibleData, slotWidth, getX, getY);
     }
   }
 
+  _drawBackground(ctx, w, h) {
+    // Base dark gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#131722');
+    grad.addColorStop(0.5, '#0e1118');
+    grad.addColorStop(1, '#090b10');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Subtle alternating vertical bands matching reference screenshot
+    const bandWidth = (w - this.paddingLeft) / 8;
+    for (let i = 0; i < 8; i++) {
+      if (i % 2 === 0) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+        ctx.fillRect(this.paddingLeft + i * bandWidth, 0, bandWidth, h);
+      }
+    }
+  }
+
   _drawGrid(ctx, w, h, plotW, plotH, minPrice, maxPrice, visibleData, getY, getX) {
-    ctx.strokeStyle = '#f0f3fa';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
     ctx.lineWidth = 1;
-    ctx.fillStyle = '#131722';
+    ctx.fillStyle = '#848e9c';
     ctx.font = '11px -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, sans-serif';
 
-    // Horizontal Grid Lines & Left Price Labels (as in reference image)
-    const numLines = 8;
+    // Horizontal Price Lines & Left Labels
+    const numLines = 7;
     for (let i = 0; i <= numLines; i++) {
       const price = minPrice + (i / numLines) * (maxPrice - minPrice);
       const y = Math.floor(getY(price)) + 0.5;
@@ -196,24 +217,36 @@ export class ChartEngine {
 
       const priceStr = this._formatPrice(price);
       ctx.textAlign = 'right';
+      ctx.fillStyle = '#848e9c';
       ctx.fillText(priceStr, this.paddingLeft - 8, y + 4);
     }
 
-    // Vertical Time Grid Lines & Bottom Labels
+    // Time Axis Labels along bottom
     const step = Math.max(1, Math.floor(visibleData.length / 5));
     for (let i = 0; i < visibleData.length; i += step) {
       const c = visibleData[i];
       const x = getX(i) + 0.5;
 
-      ctx.beginPath();
-      ctx.moveTo(x, this.paddingTop);
-      ctx.lineTo(x, plotH);
-      ctx.stroke();
-
       const timeStr = this._formatTime(c.time);
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#787b86';
+      ctx.fillStyle = '#5e6673';
       ctx.fillText(timeStr, x, plotH + 18);
+    }
+  }
+
+  _drawVolumeHistogram(ctx, candles, getX, plotH, candleWidth, maxVolume) {
+    const maxBarHeight = 65; // Volume section height
+    for (let i = 0; i < candles.length; i++) {
+      const c = candles[i];
+      const x = getX(i);
+      const vol = c.volume || 10;
+      const barH = Math.max(4, Math.floor((vol / (maxVolume || 50)) * maxBarHeight));
+      const barY = plotH - barH;
+      const barLeft = Math.floor(x - (candleWidth * 0.8) / 2);
+
+      // Semi-transparent grey volume bars as in reference image
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.09)';
+      ctx.fillRect(barLeft, barY, Math.floor(candleWidth * 0.8), barH);
     }
   }
 
@@ -227,12 +260,13 @@ export class ChartEngine {
       const lowY = getY(c.low);
 
       const isUp = c.close >= c.open;
-      const color = isUp ? '#089981' : '#f23645';
+      // Vibrant Neon Lime Green (#00E676) & Electric Red (#FF1744)
+      const color = isUp ? '#00e676' : '#ff1744';
 
       ctx.strokeStyle = color;
       ctx.fillStyle = color;
 
-      // Wick
+      // 1. Center Wick (crisp centered 1.5px line)
       const wickX = Math.floor(x) + 0.5;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -240,44 +274,26 @@ export class ChartEngine {
       ctx.lineTo(wickX, Math.floor(lowY));
       ctx.stroke();
 
-      // Body
+      // 2. Solid Rectangular Candle Body
       const bodyTop = Math.floor(Math.min(openY, closeY));
-      const bodyHeight = Math.max(2, Math.floor(Math.abs(closeY - openY)));
+      const bodyHeight = Math.max(3, Math.floor(Math.abs(closeY - openY)));
       const bodyLeft = Math.floor(x - candleWidth / 2);
 
       ctx.fillRect(bodyLeft, bodyTop, Math.floor(candleWidth), bodyHeight);
     }
   }
 
-  _drawWatermarkAndEvents(ctx, w, plotH) {
-    // TradingView Watermark at Bottom Left
-    ctx.fillStyle = 'rgba(19, 23, 34, 0.85)';
-    ctx.font = 'bold 15px -apple-system, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.fillText('17 TradingView', this.paddingLeft + 20, plotH - 24);
-
-    // Event lightning icon at bottom right
-    const iconX = w - 45;
-    const iconY = plotH - 24;
-    ctx.fillStyle = '#9c27b0';
-    ctx.beginPath();
-    ctx.arc(iconX, iconY, 9, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.font = '10px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('⚡', iconX, iconY + 3.5);
-  }
-
   _drawCurrentPriceLine(ctx, visibleData, getX, getY, w) {
     const currentCandle = visibleData[visibleData.length - 1];
     const currentPrice = currentCandle.close;
     const currentY = Math.floor(getY(currentPrice)) + 0.5;
+    const isUp = currentCandle.close >= currentCandle.open;
+    const themeColor = isUp ? '#00e676' : '#ff1744';
 
-    // Dotted teal horizontal line across the entire screen
+    // Dotted horizontal tracking line
     ctx.save();
     ctx.setLineDash([3, 3]);
-    ctx.strokeStyle = '#089981';
+    ctx.strokeStyle = themeColor;
     ctx.lineWidth = 1.2;
     ctx.beginPath();
     ctx.moveTo(this.paddingLeft, currentY);
@@ -285,16 +301,20 @@ export class ChartEngine {
     ctx.stroke();
     ctx.restore();
 
-    // Deep Teal Rounded Price Tag on the LEFT AXIS (Exact TradingView reference)
+    // Dark Pill Tag on Left Axis
     const tagW = 68;
     const tagH = 32;
     const tagX = this.paddingLeft - tagW - 2;
     const tagY = currentY - tagH / 2;
 
-    ctx.fillStyle = '#087361';
+    ctx.fillStyle = isUp ? '#004d26' : '#590014';
     ctx.beginPath();
-    ctx.roundRect(tagX, tagY, tagW, tagH, 3);
+    ctx.roundRect(tagX, tagY, tagW, tagH, 4);
     ctx.fill();
+
+    ctx.strokeStyle = themeColor;
+    ctx.lineWidth = 1;
+    ctx.stroke();
 
     // Price Text
     ctx.fillStyle = '#ffffff';
@@ -302,12 +322,12 @@ export class ChartEngine {
     ctx.textAlign = 'center';
     ctx.fillText(this._formatPrice(currentPrice), tagX + tagW / 2, tagY + 13);
 
-    // Countdown Timer (e.g. 01:28)
+    // Countdown Timer
     const countdownSec = 300 - (Math.floor(Date.now() / 1000) % 300);
     const minStr = Math.floor(countdownSec / 60).toString().padStart(2, '0');
     const secStr = (countdownSec % 60).toString().padStart(2, '0');
     ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.fillStyle = '#d0f0eb';
+    ctx.fillStyle = isUp ? '#69f0ae' : '#ff8a80';
     ctx.fillText(`${minStr}:${secStr}`, tagX + tagW / 2, tagY + 26);
   }
 
@@ -316,7 +336,7 @@ export class ChartEngine {
     const my = this.mouse.y;
 
     ctx.save();
-    ctx.strokeStyle = '#9598a1';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
     ctx.lineWidth = 1;
     ctx.setLineDash([3, 3]);
 
@@ -333,9 +353,9 @@ export class ChartEngine {
 
     // Price Tag on Left Axis
     const priceAtCursor = maxPrice - (my - this.paddingTop) / (plotH - this.paddingTop) * (maxPrice - minPrice);
-    ctx.fillStyle = '#1e222d';
+    ctx.fillStyle = '#1e2433';
     ctx.fillRect(this.paddingLeft - 70, my - 10, 68, 20);
-    ctx.fillStyle = '#fff';
+    ctx.fillStyle = '#ffffff';
     ctx.font = '10.5px "JetBrains Mono"';
     ctx.textAlign = 'center';
     ctx.fillText(this._formatPrice(priceAtCursor), this.paddingLeft - 36, my + 4);
