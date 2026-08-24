@@ -1,0 +1,266 @@
+/* ==========================================================================
+   OLYMP TRADE PRO - CHART ENGINE & CONTROLS STYLES
+   ========================================================================== */
+
+.chart-area-container {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-main);
+  overflow: hidden;
+  border-right: 1px solid var(--border-color);
+}
+
+.chart-viewport {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+canvas#mainChartCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Floating Chart Controls (Top Bar on Chart) */
+.chart-header-overlay {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.chart-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+  background: rgba(18, 24, 36, 0.75);
+  backdrop-filter: blur(12px);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  color: var(--text-secondary);
+  transition: var(--trans-fast);
+}
+
+.chart-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.chart-btn.active {
+  color: #fff;
+  background: var(--bg-surface-elevated);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.chart-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Drawing & Indicator Toolbar (Floating Left) */
+.chart-side-toolbar {
+  position: absolute;
+  top: 60px;
+  left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 10;
+}
+
+.tool-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: rgba(18, 24, 36, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm);
+  transition: var(--trans-fast);
+}
+
+.tool-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-elevated);
+  transform: translateY(-1px);
+}
+
+.tool-btn.active {
+  background: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.4);
+}
+
+/* Indicators Dropdown Panel */
+.indicators-modal {
+  position: absolute;
+  top: 56px;
+  left: 60px;
+  width: 280px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 12px;
+  z-index: 50;
+  display: none;
+  animation: slideDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.indicators-modal.show {
+  display: block;
+}
+
+.indicator-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: var(--trans-fast);
+}
+
+.indicator-item:hover {
+  background: var(--bg-hover);
+}
+
+.indicator-toggle-switch {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  transition: var(--trans-fast);
+}
+
+.indicator-toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: var(--trans-fast);
+}
+
+.indicator-item.active .indicator-toggle-switch {
+  background: var(--accent-cyan);
+}
+
+.indicator-item.active .indicator-toggle-switch::after {
+  transform: translateX(16px);
+}
+
+/* Price & HUD Overlays */
+.chart-legend {
+  position: absolute;
+  top: 58px;
+  left: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 5;
+  background: rgba(11, 14, 20, 0.6);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.legend-val {
+  color: var(--text-secondary);
+}
+
+.legend-val span {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Current Price Beacon (Floating Right) */
+.live-price-tag {
+  position: absolute;
+  right: 0;
+  padding: 3px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: var(--radius-xs) 0 0 var(--radius-xs);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+  z-index: 15;
+  pointer-events: none;
+  transition: top 0.08s linear;
+}
+
+/* Active Trade Markers on Chart */
+.chart-trade-marker {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  z-index: 20;
+  pointer-events: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  animation: pulseGlow 1.5s infinite;
+}
+
+.chart-trade-marker.up {
+  background: linear-gradient(135deg, #00b074, #00e676);
+  border: 1px solid #00ff84;
+}
+
+.chart-trade-marker.down {
+  background: linear-gradient(135deg, #e53935, #ff3b69);
+  border: 1px solid #ff527b;
+}
+
+/* Chart Bottom Mini Timeline */
+.chart-time-bar {
+  height: 24px;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
