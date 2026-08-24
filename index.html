@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOLD 4,649.237 USD — TradingView Supercharts Pro</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div id="app">
+    
+    <!-- TOP TRADINGVIEW HEADER BAR -->
+    <header class="tv-topbar">
+      <div class="tv-topbar-left">
+        <!-- User Avatar (Green R) -->
+        <div class="tv-user-avatar" title="Account Profile">R</div>
+
+        <!-- Active Symbol Button (GOLD) -->
+        <button id="tvHeaderSymbolBtn" class="tv-symbol-search-btn">
+          <span>🟡</span>
+          <span id="tvHeaderSymbolText">GOLD</span>
+        </button>
+
+        <!-- Compare Symbol (+) -->
+        <button class="tv-top-btn" title="Compare or Add Symbol">+</button>
+        <div class="tv-divider"></div>
+
+        <!-- Timeframe Selector (5m) -->
+        <button class="tv-top-btn tv-tf-btn active" data-tf="5m">
+          <span id="tvCurrentTfLabel">5m</span>
+          <span style="font-size: 9px; opacity: 0.7;">▼</span>
+        </button>
+        <div class="tv-divider"></div>
+
+        <!-- Candlestick Type -->
+        <button class="tv-top-btn" title="Candlesticks">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+            <rect x="5" y="6" width="4" height="12" rx="1"></rect>
+            <line x1="7" y1="2" x2="7" y2="22" stroke="currentColor" stroke-width="1.8"></line>
+            <rect x="15" y="8" width="4" height="8" rx="1"></rect>
+            <line x1="17" y1="4" x2="17" y2="20" stroke="currentColor" stroke-width="1.8"></line>
+          </svg>
+        </button>
+
+        <!-- Indicators (fx) -->
+        <button class="tv-top-btn" title="Indicators & Strategies">
+          <span style="font-weight: 800; font-size: 14px;">fx</span>
+        </button>
+
+        <!-- Alert Bell -->
+        <button class="tv-top-btn" title="Create Alert">⏰</button>
+
+        <!-- Bar Replay -->
+        <button class="tv-top-btn" title="Bar Replay">⏮️</button>
+        <div class="tv-divider"></div>
+
+        <!-- Undo / Redo -->
+        <button class="tv-top-btn" title="Undo">↶</button>
+        <button class="tv-top-btn" title="Redo">↷</button>
+        <div class="tv-divider"></div>
+
+        <!-- Layout Name -->
+        <button class="tv-top-btn" style="color: var(--tv-text-sub);">
+          <span>Unnamed</span>
+          <span style="font-size: 9px;">▼</span>
+        </button>
+      </div>
+
+      <div class="tv-topbar-right">
+        <button class="tv-top-btn" title="Quick Search">🔍</button>
+        <button class="tv-top-btn" title="Chart Settings">⚙️</button>
+        <button class="tv-top-btn" title="Fullscreen Mode">⛶</button>
+        <button class="tv-top-btn" title="Take a snapshot">📷</button>
+        
+        <button class="tv-btn-trade" title="Trading Panel">Trade</button>
+        <button class="tv-btn-publish" title="Publish Idea">Publish</button>
+      </div>
+    </header>
+
+    <!-- MAIN WORKSPACE -->
+    <div class="tv-workspace">
+      
+      <!-- LEFT VERTICAL DRAWING TOOLBAR -->
+      <aside class="tv-left-toolbar">
+        <div class="tv-draw-group">
+          <!-- Crosshair -->
+          <button class="tv-tool-btn active" data-tool="crosshair" title="Crosshair">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="3" x2="12" y2="21"></line><line x1="3" y1="12" x2="21" y2="12"></line></svg>
+          </button>
+          <!-- Trend Line -->
+          <button class="tv-tool-btn" data-tool="trendline" title="Trend Line">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="4" y1="20" x2="20" y2="4"></line><circle cx="4" cy="20" r="2" fill="currentColor"></circle><circle cx="20" cy="4" r="2" fill="currentColor"></circle></svg>
+          </button>
+          <!-- Fib Retracement -->
+          <button class="tv-tool-btn" data-tool="fib" title="Fibonacci Retracement">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+          </button>
+          <!-- Brush -->
+          <button class="tv-tool-btn" data-tool="brush" title="Brush">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="m9 11-6 6v3h3l6-6"></path><path d="m22 2-5 5-4-4 5-5a2 2 0 0 1 3 0l1 1a2 2 0 0 1 0 3z"></path></svg>
+          </button>
+          <!-- Text -->
+          <button class="tv-tool-btn" data-tool="text" title="Text Note">
+            <span style="font-weight: 800; font-size: 15px;">T</span>
+          </button>
+          <!-- Patterns -->
+          <button class="tv-tool-btn" data-tool="pattern" title="XABCD Pattern">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="3 17 8 7 13 14 18 4 22 17"></polyline></svg>
+          </button>
+          <!-- Measurement / Ruler -->
+          <button class="tv-tool-btn" data-tool="measure" title="Measure">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path></svg>
+          </button>
+          <!-- Icons -->
+          <button class="tv-tool-btn" data-tool="icon" title="Icons">
+            <span style="font-size: 14px;">😀</span>
+          </button>
+          <!-- Zoom -->
+          <button class="tv-tool-btn" data-tool="zoom" title="Zoom In">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line><line x1="11" y1="8" x2="11" y2="14"></line><line x1="8" y1="11" x2="14" y2="11"></line></svg>
+          </button>
+        </div>
+
+        <div class="tv-draw-group">
+          <!-- Magnet -->
+          <button class="tv-tool-btn" data-tool="magnet" title="Magnet Mode">🧲</button>
+          <!-- Lock -->
+          <button class="tv-tool-btn" data-tool="lock" title="Lock All Drawing Tools">🔒</button>
+          <!-- Hide -->
+          <button class="tv-tool-btn" data-tool="hide" title="Hide All Drawings">👁️</button>
+          <!-- Delete -->
+          <button class="tv-tool-btn" data-tool="trash" title="Remove Drawings">🗑️</button>
+        </div>
+      </aside>
+
+      <!-- CENTER TRADINGVIEW CHART -->
+      <main class="tv-chart-area">
+        
+        <!-- Header Metadata on Chart -->
+        <div class="tv-chart-header-info">
+          <div class="tv-asset-title-badge">
+            <span>🟡</span>
+            <span id="tvChartAssetTitle">CFDs on Gold (US$ / OZ) · 5 · TVC</span>
+            <span style="color: var(--tv-teal);">●</span>
+            <span style="color: var(--tv-text-sub); font-size: 11px;">≈</span>
+          </div>
+
+          <!-- OHLC Live Readout -->
+          <div class="tv-ohlc-readout" id="tvOhlcReadout">
+            <span class="ohlc-label">O</span><span class="ohlc-val">4,648.792</span>
+            <span class="ohlc-label">H</span><span class="ohlc-val">4,650.200</span>
+            <span class="ohlc-label">L</span><span class="ohlc-val">4,645.560</span>
+            <span class="ohlc-label">C</span><span class="ohlc-val">4,649.237</span>
+            <span class="text-teal" style="font-weight: 700;">+0.539 (+0.01%)</span>
+          </div>
+        </div>
+
+        <!-- Floating Quick Trade Box (SELL / SPREAD / BUY) -->
+        <div class="tv-quick-trade-box">
+          <!-- SELL BUTTON (RED) -->
+          <button id="btnTvQuickSell" class="tv-quick-btn tv-quick-btn-sell">
+            <span id="tvQuickSellPrice" class="tv-quick-price">4,649.410</span>
+            <span class="tv-quick-action">SELL</span>
+          </button>
+
+          <!-- SPREAD -->
+          <div id="tvQuickSpread" class="tv-quick-spread">140</div>
+
+          <!-- BUY BUTTON (BLUE) -->
+          <button id="btnTvQuickBuy" class="tv-quick-btn tv-quick-btn-buy">
+            <span id="tvQuickBuyPrice" class="tv-quick-price">4,649.550</span>
+            <span class="tv-quick-action">BUY</span>
+          </button>
+        </div>
+
+        <!-- Canvas Chart Container -->
+        <div class="tv-canvas-container">
+          <canvas id="mainChartCanvas"></canvas>
+        </div>
+
+        <!-- BOTTOM TIME RANGE & DATE BAR -->
+        <div class="tv-bottom-bar">
+          <div class="tv-range-buttons">
+            <button class="tv-range-btn">1D</button>
+            <button class="tv-range-btn active">5D</button>
+            <button class="tv-range-btn">1M</button>
+            <button class="tv-range-btn">3M</button>
+            <button class="tv-range-btn">6M</button>
+            <button class="tv-range-btn">YTD</button>
+            <button class="tv-range-btn">1Y</button>
+            <button class="tv-range-btn">5Y</button>
+            <button class="tv-range-btn">ALL</button>
+            <button class="tv-range-btn" title="Go to date">📅</button>
+          </div>
+
+          <div id="tvBottomUtcClock">10:08:32 UTC (ETH)</div>
+        </div>
+
+      </main>
+
+      <!-- RIGHT SIDEBAR (WATCHLIST & DETAILS & NEWS) -->
+      <aside class="tv-right-sidebar">
+        <div class="tv-sidebar-content">
+          
+          <!-- Watchlist Header -->
+          <div class="tv-wl-header">
+            <div class="tv-wl-title">
+              <span>Watchlist</span>
+              <span style="font-size: 10px; opacity: 0.7;">▼</span>
+            </div>
+            <div class="tv-wl-icons">
+              <button style="border:none; background:none; font-weight:700; font-size:16px; cursor:pointer;">+</button>
+              <button style="border:none; background:none; font-size:13px; cursor:pointer;">⊞</button>
+              <button style="border:none; background:none; font-size:13px; cursor:pointer;">•••</button>
+            </div>
+          </div>
+
+          <!-- Watchlist Columns Header -->
+          <div class="tv-wl-table-header">
+            <span>Symbol</span>
+            <span style="text-align: right;">Last</span>
+            <span style="text-align: right;">Chg</span>
+            <span style="text-align: right;">Chg%</span>
+          </div>
+
+          <!-- Section: STOCKS -->
+          <div class="tv-wl-section-title">∨ STOCKS</div>
+          <div id="wlStocksRows"></div>
+
+          <!-- Section: FUTURES -->
+          <div class="tv-wl-section-title">∨ FUTURES</div>
+          <div id="wlFuturesRows"></div>
+
+          <!-- Selected Asset Detail Card (GOLD) -->
+          <div class="tv-detail-card">
+            <div class="tv-detail-head">
+              <div class="tv-detail-sym">
+                <span>🟡</span>
+                <span id="tvDetailSymbol">GOLD</span>
+              </div>
+              <div style="display: flex; gap: 8px; color: var(--tv-text-sub);">
+                <span>⊞</span>
+                <span>✏️</span>
+                <span>•••</span>
+              </div>
+            </div>
+
+            <div id="tvDetailName" class="tv-detail-subtitle">CFDs on Gold (US$ / OZ) · TVC</div>
+            <div id="tvDetailType" style="font-size: 11px; color: var(--tv-text-sub);">Commodity · Cfd</div>
+
+            <div id="tvDetailBigPrice" class="tv-detail-big-price">
+              4,649.<span class="fraction">263</span> <span style="font-size: 16px; font-weight: 600; color: var(--tv-text-sub);">USD</span>
+            </div>
+
+            <div id="tvDetailChange" class="tv-detail-change-row text-teal">
+              +46.603 +1.01%
+            </div>
+
+            <div class="tv-market-status">
+              <span class="status-dot-green"></span>
+              <span>Market open</span>
+            </div>
+          </div>
+
+          <!-- News Mini Card -->
+          <div class="tv-news-card">
+            <div class="tv-news-meta">News · 1 hour ago</div>
+            <div class="tv-news-headline">Gold climbs to more than three-month high as markets await US inflation data</div>
+            <div style="font-size: 11px; color: var(--tv-text-sub); margin-top: 6px; cursor: pointer;">More events 〉</div>
+          </div>
+
+        </div>
+
+        <!-- Far Right Vertical Icon Dock -->
+        <div class="tv-far-right-dock">
+          <div class="tv-dock-icons-top">
+            <button class="tv-dock-btn active" title="Watchlist and details">📑</button>
+            <button class="tv-dock-btn" title="Alerts">⏰</button>
+            <button class="tv-dock-btn" title="News">📰</button>
+            <button class="tv-dock-btn" title="Hotlists">🔥</button>
+            <button class="tv-dock-btn" title="Calendar">📅</button>
+            <button class="tv-dock-btn" title="My Ideas">💡</button>
+            <button class="tv-dock-btn" title="Public Chats">💬</button>
+            <button class="tv-dock-btn" title="Notifications">🔔</button>
+            <button class="tv-dock-btn" title="Order Panel">🎛️</button>
+          </div>
+
+          <div>
+            <button class="tv-dock-btn" title="Help Center">❓</button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" style="position: fixed; bottom: 45px; right: 340px; z-index: 999; display: flex; flex-direction: column; gap: 6px;"></div>
+
+  </div>
+
+  <!-- App Bootstrap -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
